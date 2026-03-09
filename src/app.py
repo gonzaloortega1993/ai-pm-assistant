@@ -73,18 +73,66 @@ if feature == "📝 User Story Generator":
 
     st.header("📝 User Story Generator")
     st.markdown("Generate user stories from your project description using AI")
+    # Example templates
+    st.markdown("**Need inspiration?** Try one of these example projects:")
     
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("📱 Fitness App", use_container_width=True):
+            st.session_state.example_text = """We're building a fitness tracking mobile app that helps users:
+- Log daily workouts with exercise types and duration
+- Track nutrition and calorie intake
+- Set fitness goals and monitor progress
+- Connect with personal trainers for guidance
+- View progress reports and achievement badges"""
+    
+    with col2:
+        if st.button("🛒 E-commerce", use_container_width=True):
+            st.session_state.example_text = """We're creating an e-commerce platform for handmade crafts where:
+- Artisans can set up online stores with custom branding
+- Customers can browse by category, search, and filter products
+- Secure payment processing with multiple payment methods
+- Order tracking and shipping notifications
+- Review and rating system for products and sellers"""
+    
+    with col3:
+        if st.button("🏥 Telemedicine", use_container_width=True):
+            st.session_state.example_text = """We're developing a telemedicine platform that enables:
+- Virtual consultations via video call with licensed doctors
+- Secure medical record storage and sharing
+- Prescription management and pharmacy integration
+- Appointment scheduling with calendar sync
+- Health monitoring with wearable device integration"""
+    
+    st.markdown("---")
     # Input
+# Initialize session state
+    if 'example_text' not in st.session_state:
+        st.session_state.example_text = ""
+    
     project_desc = st.text_area(
         "Project Description",
+        value=st.session_state.example_text,
         placeholder="Describe your project in detail...\n\nExample: We're building a mobile app for fitness tracking that helps users log workouts, track nutrition, and connect with personal trainers.",
         height=150,
         help="Minimum 50 characters for best results"
     )
     
-    # Optional: Document upload (coming soon)
-    with st.expander("📎 Upload Reference Documents (Coming in Sprint 2)"):
-        st.info("RAG feature will be added in Sprint 2 to use uploaded docs for context-aware generation")
+    # Clear example after use
+    if project_desc and st.session_state.example_text:
+        st.session_state.example_text = ""
+    
+    # Future feature notice
+    with st.expander("🔮 Coming Soon: Document Upload (RAG)", expanded=False):
+        st.info("""
+        **Planned for Sprint 2:**
+        
+        Upload reference documents (PDFs, specs, requirements) and the AI will use them as context 
+        to generate more specific, context-aware user stories.
+        
+        This feature uses Retrieval Augmented Generation (RAG) with vector embeddings.
+        """)
     
     # Generate button
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -120,13 +168,35 @@ if feature == "📝 User Story Generator":
                 
             except ValueError as e:
                 st.error(f"⚠️ Configuration Error: {str(e)}")
-                st.info("💡 Make sure your ANTHROPIC_API_KEY is set in the .env file")
                 
+                with st.expander("🔧 How to fix this"):
+                    st.markdown("""
+                    **Missing API Key?**
+                    
+                    1. Make sure you have a `.env` file in your project root
+                    2. Add this line: `ANTHROPIC_API_KEY=your-key-here`
+                    3. Get your API key from: https://console.anthropic.com/
+                    4. Restart the Streamlit app
+                    
+                    **Still having issues?** Check that:
+                    - Your API key is valid
+                    - You have credits in your Anthropic account
+                    - LLM_PROVIDER is set to 'claude' in .env
+                    """)
+                    
             except Exception as e:
                 st.error(f"❌ Error generating stories: {str(e)}")
-                st.info("Please try again or check your API configuration")
-
-
+                
+                with st.expander("💡 Troubleshooting tips"):
+                    st.markdown("""
+                    **Common issues:**
+                    
+                    - **API Error:** Check your Anthropic account has credits
+                    - **Timeout:** Try a shorter project description
+                    - **Rate limit:** Wait a minute and try again
+                    
+                    **Need help?** The error above might give more details.
+                    """)
 elif feature == "⏱️ Time Estimator":
     st.header("⏱️ Time Estimator")
     st.markdown("Estimate project timeline using ML")
@@ -158,12 +228,28 @@ else:  # Meeting Summarizer
     st.text_area("Meeting Transcript", disabled=True, height=200)
     st.button("Summarize Meeting", disabled=True)
 
+
 # Footer
 st.markdown("---")
-col1, col2, col3 = st.columns(3)
+st.markdown("### 💡 About This App")
+
+col1, col2 = st.columns(2)
+
 with col1:
-    st.caption("🛠️ Built with Streamlit + LangChain + Claude")
+    st.markdown("""
+    **Built with:**
+    - 🤖 Claude Sonnet 4 (AI)
+    - 🎨 Streamlit (UI)
+    - 🔗 LangChain (Orchestration)
+    - 🐍 Python
+    """)
+
 with col2:
-    st.caption("📍 Copenhagen, Denmark")
-with col3:
-    st.caption("© 2026 AI PM Assistant")
+    st.markdown("""
+    **Created by:** Gonzalo Ortega\n
+    **Location:** Copenhagen, Denmark\n
+    **GitHub:** [https://github.com/gonzaloortega1993/ai-pm-assistant]\n
+    **Sprint:** 1 (MVP Complete)
+    """)
+
+st.caption("AI PM Assistant © 2026 | Built following Scrum methodology")
