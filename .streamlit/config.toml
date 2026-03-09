@@ -1,0 +1,24 @@
+[theme]
+primaryColor = "#007bff"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f8f9fa"
+textColor = "#1f2937"
+font = "sans serif"
+
+[server]
+headless = true
+port = 8501
+```
+
+**Save**
+
+Type: `done` when created
+
+---
+
+## **STEP 9: Update .gitignore**
+
+1. **Open** `.gitignore`
+2. **Add this line at the end:**
+```
+.streamlit/secrets.toml
