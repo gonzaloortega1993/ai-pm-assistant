@@ -1,6 +1,11 @@
 import streamlit as st
 from dotenv import load_dotenv
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from utils.llm_client import LLMClient
+from components.story_card import display_all_stories
 
 # Load environment variables
 load_dotenv()
@@ -64,51 +69,63 @@ with st.sidebar:
 
 # Main content
 if feature == "📝 User Story Generator":
+
+
     st.header("📝 User Story Generator")
-    st.markdown("Generate user stories from your project description using AI + RAG")
+    st.markdown("Generate user stories from your project description using AI")
     
     # Input
     project_desc = st.text_area(
         "Project Description",
         placeholder="Describe your project in detail...\n\nExample: We're building a mobile app for fitness tracking that helps users log workouts, track nutrition, and connect with personal trainers.",
         height=150,
-        help="Min 50 characters for best results"
+        help="Minimum 50 characters for best results"
     )
     
     # Optional: Document upload (coming soon)
-    with st.expander("📎 Upload Reference Documents (Optional - Coming Soon)"):
-        st.info("Feature in development: Upload PDFs/docs for context-aware story generation")
+    with st.expander("📎 Upload Reference Documents (Coming in Sprint 2)"):
+        st.info("RAG feature will be added in Sprint 2 to use uploaded docs for context-aware generation")
     
     # Generate button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("✨ Generate User Stories", type="primary"):
-            if project_desc and len(project_desc) >= 50:
-                with st.spinner("🤖 AI is generating user stories..."):
-                    # Placeholder - will implement in Sprint 1
-                    import time
-                    time.sleep(2)
+        generate_button = st.button("✨ Generate User Stories", type="primary")
+    
+    # Generation logic
+    if generate_button:
+        if not project_desc or len(project_desc) < 50:
+            st.error("❌ Please enter at least 50 characters describing your project")
+        else:
+            try:
+                # Initialize LLM client
+                with st.spinner("🤖 Claude is analyzing your project and generating user stories..."):
+                    client = LLMClient()
                     
-                    st.success("✅ User stories generated!")
+                    # Generate stories
+                    stories_response = client.generate_user_stories(project_desc)
                     
-                    # Mock output
-                    st.markdown("### Generated User Stories:")
-                    for i in range(1, 6):
-                        with st.container():
-                            st.markdown(f"""
-                            <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                <span style="background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px;">
-                                    {i*2} Story Points
-                                </span>
-                                <p style="margin-top: 10px; font-size: 16px;">
-                                    <strong>Story {i}:</strong> As a [user], I want to [feature], so that [benefit]
-                                </p>
-                            </div>
-                            """, unsafe_allow_html=True)
-                    
-                    st.info("🚧 This is a demo. Real AI generation coming in Sprint 1!")
-            else:
-                st.error("❌ Please enter at least 50 characters")
+                st.success("✅ User stories generated successfully!")
+                
+                # Display stories using story cards
+                st.markdown("### 📋 Generated User Stories")
+                display_all_stories(stories_response)
+                
+                # Download button
+                st.download_button(
+                    label="📥 Download as Markdown",
+                    data=stories_response,
+                    file_name="user_stories.md",
+                    mime="text/markdown"
+                )
+                
+            except ValueError as e:
+                st.error(f"⚠️ Configuration Error: {str(e)}")
+                st.info("💡 Make sure your ANTHROPIC_API_KEY is set in the .env file")
+                
+            except Exception as e:
+                st.error(f"❌ Error generating stories: {str(e)}")
+                st.info("Please try again or check your API configuration")
+
 
 elif feature == "⏱️ Time Estimator":
     st.header("⏱️ Time Estimator")
