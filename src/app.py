@@ -68,60 +68,50 @@ with st.sidebar:
     st.markdown("[Documentation](https://drive.google.com)")
 
 # Main content
+
 if feature == "📝 User Story Generator":
-
-
     st.header("📝 User Story Generator")
     st.markdown("Generate user stories from your project description using AI")
-    # Example templates
-    st.markdown("**Need inspiration?** Try one of these example projects:")
+    
+    # Example templates with buttons
+    st.markdown("**💡 Quick Start Examples:**")
     
     col1, col2, col3 = st.columns(3)
     
+    fitness_example = """We're building a fitness tracking mobile app that helps users log daily workouts with exercise types and duration, track nutrition and calorie intake, set fitness goals and monitor progress, connect with personal trainers for guidance, and view progress reports with achievement badges."""
+    
+    ecommerce_example = """We're creating an e-commerce platform for handmade crafts where artisans can set up online stores with custom branding, customers can browse by category and search products, process secure payments with multiple payment methods, track orders with shipping notifications, and leave reviews and ratings for products and sellers."""
+    
+    telemedicine_example = """We're developing a telemedicine platform that enables virtual consultations via video call with licensed doctors, secure medical record storage and sharing, prescription management with pharmacy integration, appointment scheduling with calendar sync, and health monitoring with wearable device integration."""
+    
     with col1:
-        if st.button("📱 Fitness App", use_container_width=True):
-            st.session_state.example_text = """We're building a fitness tracking mobile app that helps users:
-- Log daily workouts with exercise types and duration
-- Track nutrition and calorie intake
-- Set fitness goals and monitor progress
-- Connect with personal trainers for guidance
-- View progress reports and achievement badges"""
+        if st.button("📱 Fitness App", use_container_width=True, key="btn_fitness"):
+            st.session_state['project_input'] = fitness_example
+            st.rerun()
     
     with col2:
-        if st.button("🛒 E-commerce", use_container_width=True):
-            st.session_state.example_text = """We're creating an e-commerce platform for handmade crafts where:
-- Artisans can set up online stores with custom branding
-- Customers can browse by category, search, and filter products
-- Secure payment processing with multiple payment methods
-- Order tracking and shipping notifications
-- Review and rating system for products and sellers"""
+        if st.button("🛒 E-commerce", use_container_width=True, key="btn_ecommerce"):
+            st.session_state['project_input'] = ecommerce_example
+            st.rerun()
     
     with col3:
-        if st.button("🏥 Telemedicine", use_container_width=True):
-            st.session_state.example_text = """We're developing a telemedicine platform that enables:
-- Virtual consultations via video call with licensed doctors
-- Secure medical record storage and sharing
-- Prescription management and pharmacy integration
-- Appointment scheduling with calendar sync
-- Health monitoring with wearable device integration"""
+        if st.button("🏥 Telemedicine", use_container_width=True, key="btn_telemedicine"):
+            st.session_state['project_input'] = telemedicine_example
+            st.rerun()
     
     st.markdown("---")
-    # Input
-# Initialize session state
-    if 'example_text' not in st.session_state:
-        st.session_state.example_text = ""
     
+    # Input text area - uses session state
     project_desc = st.text_area(
         "Project Description",
-        value=st.session_state.example_text,
-        placeholder="Describe your project in detail...\n\nExample: We're building a mobile app for fitness tracking that helps users log workouts, track nutrition, and connect with personal trainers.",
+        placeholder="Describe your project in detail (minimum 50 characters)...",
         height=150,
-        help="Minimum 50 characters for best results"
+        help="Describe what you're building - the more detail, the better the stories!",
+        key="project_input"
     )
     
-    # Clear example after use
-    if project_desc and st.session_state.example_text:
-        st.session_state.example_text = ""
+    # Update session state with current input
+    st.session_state['user_input'] = project_desc
     
     # Future feature notice
     with st.expander("🔮 Coming Soon: Document Upload (RAG)", expanded=False):
@@ -141,24 +131,19 @@ if feature == "📝 User Story Generator":
     
     # Generation logic
     if generate_button:
-        if not project_desc or len(project_desc) < 50:
+        if not project_desc.strip() or len(project_desc.strip()) < 50:
             st.error("❌ Please enter at least 50 characters describing your project")
         else:
             try:
-                # Initialize LLM client
                 with st.spinner("🤖 Claude is analyzing your project and generating user stories..."):
                     client = LLMClient()
-                    
-                    # Generate stories
                     stories_response = client.generate_user_stories(project_desc)
                     
                 st.success("✅ User stories generated successfully!")
                 
-                # Display stories using story cards
                 st.markdown("### 📋 Generated User Stories")
                 display_all_stories(stories_response)
                 
-                # Download button
                 st.download_button(
                     label="📥 Download as Markdown",
                     data=stories_response,
@@ -168,34 +153,22 @@ if feature == "📝 User Story Generator":
                 
             except ValueError as e:
                 st.error(f"⚠️ Configuration Error: {str(e)}")
-                
                 with st.expander("🔧 How to fix this"):
                     st.markdown("""
                     **Missing API Key?**
-                    
-                    1. Make sure you have a `.env` file in your project root
-                    2. Add this line: `ANTHROPIC_API_KEY=your-key-here`
-                    3. Get your API key from: https://console.anthropic.com/
-                    4. Restart the Streamlit app
-                    
-                    **Still having issues?** Check that:
-                    - Your API key is valid
-                    - You have credits in your Anthropic account
-                    - LLM_PROVIDER is set to 'claude' in .env
+                    1. Make sure `.env` file exists
+                    2. Add: `ANTHROPIC_API_KEY=your-key-here`
+                    3. Get key from: https://console.anthropic.com/
+                    4. Restart app
                     """)
                     
             except Exception as e:
-                st.error(f"❌ Error generating stories: {str(e)}")
-                
-                with st.expander("💡 Troubleshooting tips"):
+                st.error(f"❌ Error: {str(e)}")
+                with st.expander("💡 Troubleshooting"):
                     st.markdown("""
-                    **Common issues:**
-                    
-                    - **API Error:** Check your Anthropic account has credits
-                    - **Timeout:** Try a shorter project description
-                    - **Rate limit:** Wait a minute and try again
-                    
-                    **Need help?** The error above might give more details.
+                    - Check Anthropic account has credits
+                    - Try shorter description
+                    - Wait a minute if rate limited
                     """)
 elif feature == "⏱️ Time Estimator":
     st.header("⏱️ Time Estimator")
