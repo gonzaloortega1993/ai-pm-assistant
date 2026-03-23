@@ -73,10 +73,8 @@ if feature == "📝 User Story Generator":
     st.header("📝 User Story Generator")
     st.markdown("Generate user stories from your project description using AI")
     
-    # Example templates with buttons
-    st.markdown("**💡 Quick Start Examples:**")
-    
-    col1, col2, col3 = st.columns(3)
+    # Example templates
+    st.markdown("**💡 Need inspiration? Copy and paste one of these:**")
     
     fitness_example = """We're building a fitness tracking mobile app that helps users log daily workouts with exercise types and duration, track nutrition and calorie intake, set fitness goals and monitor progress, connect with personal trainers for guidance, and view progress reports with achievement badges."""
     
@@ -84,34 +82,31 @@ if feature == "📝 User Story Generator":
     
     telemedicine_example = """We're developing a telemedicine platform that enables virtual consultations via video call with licensed doctors, secure medical record storage and sharing, prescription management with pharmacy integration, appointment scheduling with calendar sync, and health monitoring with wearable device integration."""
     
-    with col1:
-        if st.button("📱 Fitness App", use_container_width=True, key="btn_fitness"):
-            st.session_state['project_input'] = fitness_example
-            st.rerun()
+    # Show examples in expandable sections
+    with st.expander("📱 Fitness App Example"):
+        st.code(fitness_example, language=None)
+        if st.button("📋 Copy to clipboard", key="copy_fitness"):
+            st.info("💡 Copy the text above and paste into the description box below")
     
-    with col2:
-        if st.button("🛒 E-commerce", use_container_width=True, key="btn_ecommerce"):
-            st.session_state['project_input'] = ecommerce_example
-            st.rerun()
+    with st.expander("🛒 E-commerce Example"):
+        st.code(ecommerce_example, language=None)
+        if st.button("📋 Copy to clipboard", key="copy_ecommerce"):
+            st.info("💡 Copy the text above and paste into the description box below")
     
-    with col3:
-        if st.button("🏥 Telemedicine", use_container_width=True, key="btn_telemedicine"):
-            st.session_state['project_input'] = telemedicine_example
-            st.rerun()
+    with st.expander("🏥 Telemedicine Example"):
+        st.code(telemedicine_example, language=None)
+        if st.button("📋 Copy to clipboard", key="copy_telemedicine"):
+            st.info("💡 Copy the text above and paste into the description box below")
     
     st.markdown("---")
     
-    # Input text area - uses session state
+    # Input text area
     project_desc = st.text_area(
         "Project Description",
         placeholder="Describe your project in detail (minimum 50 characters)...",
         height=150,
-        help="Describe what you're building - the more detail, the better the stories!",
-        key="project_input"
+        help="Describe what you're building - the more detail, the better the stories!"
     )
-    
-    # Update session state with current input
-    st.session_state['user_input'] = project_desc
     
     # Future feature notice
     with st.expander("🔮 Coming Soon: Document Upload (RAG)", expanded=False):
@@ -127,12 +122,13 @@ if feature == "📝 User Story Generator":
     # Generate button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        generate_button = st.button("✨ Generate User Stories", type="primary")
+        generate_button = st.button("✨ Generate User Stories", type="primary", use_container_width=True)
     
     # Generation logic
     if generate_button:
-        if not project_desc.strip() or len(project_desc.strip()) < 50:
+        if not project_desc or len(project_desc.strip()) < 50:
             st.error("❌ Please enter at least 50 characters describing your project")
+            st.info("💡 Tip: Copy one of the examples above to get started, or write your own detailed description")
         else:
             try:
                 with st.spinner("🤖 Claude is analyzing your project and generating user stories..."):
@@ -148,28 +144,57 @@ if feature == "📝 User Story Generator":
                     label="📥 Download as Markdown",
                     data=stories_response,
                     file_name="user_stories.md",
-                    mime="text/markdown"
+                    mime="text/markdown",
+                    use_container_width=True
                 )
                 
-            except ValueError as e:
-                st.error(f"⚠️ Configuration Error: {str(e)}")
-                with st.expander("🔧 How to fix this"):
+            except ValueError as ve:
+                st.error(f"⚠️ Configuration Error: {str(ve)}")
+                with st.expander("🔧 How to fix this", expanded=True):
                     st.markdown("""
                     **Missing API Key?**
-                    1. Make sure `.env` file exists
-                    2. Add: `ANTHROPIC_API_KEY=your-key-here`
-                    3. Get key from: https://console.anthropic.com/
-                    4. Restart app
+                    
+                    1. Make sure you have a `.env` file in your project root
+                    2. Add this line: `ANTHROPIC_API_KEY=your-key-here`
+                    3. Get your API key from: https://console.anthropic.com/
+                    4. Restart the Streamlit app
+                    
+                    **Still having issues?**
+                    - Verify your API key is valid
+                    - Check you have credits in your Anthropic account
+                    - Ensure `LLM_PROVIDER=claude` in .env
+                    """)
+                    
+            except ConnectionError as ce:
+                st.error("❌ Connection Error: Unable to reach Claude API")
+                with st.expander("💡 Troubleshooting", expanded=True):
+                    st.markdown("""
+                    **Check your internet connection**
+                    - Verify you're online
+                    - Try visiting https://www.anthropic.com in your browser
+                    
+                    **If you're behind a firewall:**
+                    - Claude API may be blocked
+                    - Try from a different network
                     """)
                     
             except Exception as e:
-                st.error(f"❌ Error: {str(e)}")
-                with st.expander("💡 Troubleshooting"):
+                st.error(f"❌ Unexpected error: {str(e)}")
+                with st.expander("💡 Troubleshooting", expanded=True):
                     st.markdown("""
-                    - Check Anthropic account has credits
-                    - Try shorter description
-                    - Wait a minute if rate limited
+                    **Common issues:**
+                    
+                    - **Rate limit:** Wait 1-2 minutes and try again
+                    - **Timeout:** Try a shorter project description
+                    - **Invalid response:** Check API status at status.anthropic.com
+                    
+                    **Still stuck?**
+                    - Copy the error message above
+                    - Check Anthropic's documentation
+                    - Verify all dependencies are installed
                     """)
+                st.caption(f"Error details: {type(e).__name__}")
+
 elif feature == "⏱️ Time Estimator":
     st.header("⏱️ Time Estimator")
     st.markdown("Estimate project timeline using ML")
