@@ -58,47 +58,56 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📊 Project Status")
-    st.progress(0.15)
-    st.caption("Sprint 0: Setup Complete ✅")
-    st.caption("Sprint 1: In Progress 🚧")
+    st.progress(1.0)
+    st.caption("Sprint 1: Complete ✅")
     
     st.markdown("---")
     st.markdown("### 🔗 Links")
-    st.markdown("[GitHub](https://github.com/YOUR-USERNAME/ai-pm-assistant)")
+    st.markdown("[GitHub](https://github.com/gonzaloortega1993/ai-pm-assistant)")
     st.markdown("[Documentation](https://drive.google.com)")
 
 # Main content
-
 if feature == "📝 User Story Generator":
     st.header("📝 User Story Generator")
     st.markdown("Generate user stories from your project description using AI")
     
-    # Example templates
-    st.markdown("**💡 Need inspiration? Copy and paste one of these:**")
+    # Example templates - simple copy/paste
+    st.markdown("**💡 Need inspiration? Copy one of these examples:**")
     
-    fitness_example = """We're building a fitness tracking mobile app that helps users log daily workouts with exercise types and duration, track nutrition and calorie intake, set fitness goals and monitor progress, connect with personal trainers for guidance, and view progress reports with achievement badges."""
+    col1, col2, col3 = st.columns(3)
     
-    ecommerce_example = """We're creating an e-commerce platform for handmade crafts where artisans can set up online stores with custom branding, customers can browse by category and search products, process secure payments with multiple payment methods, track orders with shipping notifications, and leave reviews and ratings for products and sellers."""
+    with col1:
+        st.markdown("**📱 Fitness App**")
+        st.text_area(
+            "Select and copy:",
+            value="""We're building a fitness tracking mobile app that helps users log daily workouts with exercise types and duration, track nutrition and calorie intake, set fitness goals and monitor progress, connect with personal trainers for guidance, and view progress reports with achievement badges.""",
+            height=150,
+            key="fitness_example",
+            label_visibility="collapsed"
+        )
     
-    telemedicine_example = """We're developing a telemedicine platform that enables virtual consultations via video call with licensed doctors, secure medical record storage and sharing, prescription management with pharmacy integration, appointment scheduling with calendar sync, and health monitoring with wearable device integration."""
+    with col2:
+        st.markdown("**🛒 E-commerce**")
+        st.text_area(
+            "Select and copy:",
+            value="""We're creating an e-commerce platform for handmade crafts where artisans can set up online stores with custom branding, customers can browse by category and search products, process secure payments with multiple payment methods, track orders with shipping notifications, and leave reviews and ratings for products and sellers.""",
+            height=150,
+            key="ecommerce_example",
+            label_visibility="collapsed"
+        )
     
-    # Show examples in expandable sections
-    with st.expander("📱 Fitness App Example"):
-        st.code(fitness_example, language=None)
-        if st.button("📋 Copy to clipboard", key="copy_fitness"):
-            st.info("💡 Copy the text above and paste into the description box below")
-    
-    with st.expander("🛒 E-commerce Example"):
-        st.code(ecommerce_example, language=None)
-        if st.button("📋 Copy to clipboard", key="copy_ecommerce"):
-            st.info("💡 Copy the text above and paste into the description box below")
-    
-    with st.expander("🏥 Telemedicine Example"):
-        st.code(telemedicine_example, language=None)
-        if st.button("📋 Copy to clipboard", key="copy_telemedicine"):
-            st.info("💡 Copy the text above and paste into the description box below")
+    with col3:
+        st.markdown("**🏥 Telemedicine**")
+        st.text_area(
+            "Select and copy:",
+            value="""We're developing a telemedicine platform that enables virtual consultations via video call with licensed doctors, secure medical record storage and sharing, prescription management with pharmacy integration, appointment scheduling with calendar sync, and health monitoring with wearable device integration.""",
+            height=150,
+            key="telemedicine_example",
+            label_visibility="collapsed"
+        )
     
     st.markdown("---")
+    st.caption("👆 Click any example, select all (Ctrl+A), copy (Ctrl+C), then paste below (Ctrl+V)")
     
     # Input text area
     project_desc = st.text_area(
@@ -226,7 +235,6 @@ else:  # Meeting Summarizer
     st.text_area("Meeting Transcript", disabled=True, height=200)
     st.button("Summarize Meeting", disabled=True)
 
-
 # Footer
 st.markdown("---")
 st.markdown("### 💡 About This App")
@@ -244,9 +252,9 @@ with col1:
 
 with col2:
     st.markdown("""
-    **Created by:** Gonzalo Ortega\n
-    **Location:** Copenhagen, Denmark\n
-    **GitHub:** [https://github.com/gonzaloortega1993/ai-pm-assistant]\n
+    **Created by:** Gonzalo Ortega  
+    **Location:** Copenhagen, Denmark  
+    **GitHub:** [github.com/gonzaloortega1993/ai-pm-assistant](https://github.com/gonzaloortega1993/ai-pm-assistant)  
     **Sprint:** 1 (MVP Complete)
     """)
 
